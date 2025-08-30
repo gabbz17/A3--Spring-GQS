@@ -21,11 +21,9 @@ public class PeopleService {
         return people;
     }
 
-    /*public List<People> findAll() {
-        for (People people : list) {
-
-        }
-    }*/
+    public List<People> findAll() {
+        return list;
+    }
 
     public People findById(int id) {
         People guy = null;
