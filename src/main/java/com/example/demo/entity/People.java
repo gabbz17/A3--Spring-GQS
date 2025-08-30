@@ -9,11 +9,10 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(of = "id")
 public class People {
 
 
-    private Integer id;
+    private int id;
     @NotBlank
     private String name;
     @NotBlank

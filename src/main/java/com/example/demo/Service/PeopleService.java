@@ -15,8 +15,8 @@ public class PeopleService {
 
 
     public People create(People people) {
+        people.setId(list.size() + 1);
         list.add(people);
-        people.setId(list.size());
 
         return people;
     }
@@ -27,7 +27,7 @@ public class PeopleService {
         }
     }*/
 
-    public People findById(Integer id) {
+    public People findById(int id) {
         People guy = null;
 
         for(People people : list) {
