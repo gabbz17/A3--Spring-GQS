@@ -13,7 +13,7 @@ import lombok.*;
 public class People {
 
 
-    private Long id;
+    private Integer id;
     @NotBlank
     private String name;
     @NotBlank
