@@ -36,4 +36,19 @@ public class PeopleService {
 
         return guy;
     }
+    
+    public People updateName(int id, String nome) {
+        People guy = null;
+
+        for(People people : list) {
+            if (Objects.equals(people.getId(), id)) {
+                guy = new People(people.getId(), people.getName(), people.getEmail(), people.getNumber());
+                guy.setName(nome);
+            }
+        }
+
+        return guy;
+    }
+
+
 }
