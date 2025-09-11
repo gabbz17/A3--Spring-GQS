@@ -33,4 +33,10 @@ public class PeopleController {
         List<People> guy = service.findAll();
         return ResponseEntity.ok().body(guy);
     }
+
+    @PathVariable("/id/{id}")
+    public ResponseEntity<People> updateName(@PathVariable int id, @RequestBody String nome){
+        People guy = service.updateName(id, nome);
+        return ResponseEntity.ok().body(guy);
+    }
 }
