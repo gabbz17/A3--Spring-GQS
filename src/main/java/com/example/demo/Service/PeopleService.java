@@ -1,6 +1,8 @@
 package com.example.demo.Service;
 
 import com.example.demo.entity.People;
+import com.example.demo.entity.RequestNameUpdate;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,28 +28,17 @@ public class PeopleService {
     }
 
     public People findById(int id) {
-        People guy = null;
+        People people = list.get(id - 1);
 
-        for(People people : list) {
-            if (Objects.equals(people.getId(), id)) {
-                guy = new People(people.getId(), people.getName(), people.getEmail(), people.getNumber());
-            }
-        }
-
-        return guy;
+        return people;
     }
     
-    public People updateName(int id, String nome) {
-        People guy = null;
+    public People updateName(int id, RequestNameUpdate nome) {
+        list.get(id - 1).setName(nome.getName());
 
-        for(People people : list) {
-            if (Objects.equals(people.getId(), id)) {
-                guy = new People(people.getId(), people.getName(), people.getEmail(), people.getNumber());
-                guy.setName(nome);
-            }
-        }
-
-        return guy;
+        People people = list.get(id - 1);
+        
+        return people;
     }
 
 

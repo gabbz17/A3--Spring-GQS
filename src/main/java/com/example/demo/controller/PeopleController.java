@@ -2,6 +2,8 @@ package com.example.demo.controller;
 
 import com.example.demo.Service.PeopleService;
 import com.example.demo.entity.People;
+import com.example.demo.entity.RequestNameUpdate;
+
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -34,8 +36,8 @@ public class PeopleController {
         return ResponseEntity.ok().body(guy);
     }
 
-    @PathVariable("/id/{id}")
-    public ResponseEntity<People> updateName(@PathVariable int id, @RequestBody String nome){
+    @PatchMapping("/id/{id}")
+    public ResponseEntity<People> updateName(@PathVariable int id, @RequestBody @Valid RequestNameUpdate nome){
         People guy = service.updateName(id, nome);
         return ResponseEntity.ok().body(guy);
     }
