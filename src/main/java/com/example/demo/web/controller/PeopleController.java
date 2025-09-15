@@ -1,9 +1,9 @@
-package com.example.demo.controller;
+package com.example.demo.web.controller;
 
 import com.example.demo.Service.PeopleService;
 import com.example.demo.entity.People;
-import com.example.demo.entity.RequestNameUpdate;
 
+import com.example.demo.web.dto.RequestNameUpdate;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
