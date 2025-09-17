@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class PeopleService {
@@ -34,6 +35,7 @@ public class PeopleService {
 
         return peopleList.get(id - 1);
     }
-
-
+    public boolean deleteById(int id) {
+        return peopleList.removeIf(people -> Objects.equals(people.getId(), id));
+    }
 }

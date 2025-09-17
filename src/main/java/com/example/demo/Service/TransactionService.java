@@ -43,4 +43,7 @@ public class TransactionService {
     public List<Transaction> findAll() {
         return transactionList;
     }
+    public boolean deleteById(int id) {
+        return transactionList.removeIf(transaction -> transaction.getId() == id);
+    }
 }
