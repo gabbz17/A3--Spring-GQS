@@ -48,4 +48,12 @@ public class PeopleController {
         People guy = service.updateName(id, nome);
         return ResponseEntity.ok().body(guy);
     }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> delebeById(@PathVariable int id){
+        service.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    
 }
