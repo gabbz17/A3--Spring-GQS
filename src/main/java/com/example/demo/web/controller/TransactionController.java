@@ -28,4 +28,10 @@ public class TransactionController {
         List<Transaction> list = service.findAll();
         return ResponseEntity.ok().body(list);
     }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> delebeById(@PathVariable int id){
+        service.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
 }
