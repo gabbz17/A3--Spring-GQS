@@ -35,7 +35,7 @@ public class PeopleService {
 
         return peopleList.get(id - 1);
     }
-    public boolean deleteById(int id) {
-        return peopleList.removeIf(people -> Objects.equals(people.getNumberAccount(), id));
+    public void deleteById(int id) {
+        peopleList.removeIf(people -> Objects.equals(people.getNumberAccount(), id));
     }
 }
