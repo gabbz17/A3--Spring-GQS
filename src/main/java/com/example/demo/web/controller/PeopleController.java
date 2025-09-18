@@ -4,7 +4,12 @@ import com.example.demo.Service.PeopleService;
 import com.example.demo.entity.People;
 
 import com.example.demo.web.dto.RequestNameUpdate;
+import com.example.demo.web.dto.ResponsePeopleDto;
+import com.example.demo.web.mapper.PeopleMapper;
+
 import jakarta.validation.Valid;
+
+import org.apache.catalina.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,15 +30,17 @@ public class PeopleController {
     }
 
     @GetMapping("/id/{id}")
-    public ResponseEntity<People> findById(@PathVariable int id){
+    public ResponseEntity<ResponsePeopleDto> findById(@PathVariable int id){
         People guy = service.findById(id);
-        return ResponseEntity.ok().body(guy);
+        ResponsePeopleDto dto = PeopleMapper.toDto(guy);
+        return ResponseEntity.ok().body(dto);
     }
 
     @GetMapping
-    public ResponseEntity<List<People>> findAll(){
+    public ResponseEntity<List<ResponsePeopleDto>> findAll(){
         List<People> guy = service.findAll();
-        return ResponseEntity.ok().body(guy);
+        List<ResponsePeopleDto> dto = PeopleMapper.toAllDto(guy);
+        return ResponseEntity.ok().body(dto);
     }
 
     @PatchMapping("/id/{id}")
