@@ -1,7 +1,8 @@
 package com.example.demo.Service;
 
 import com.example.demo.entity.People;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import com.example.demo.web.dto.RequestNameUpdate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -11,29 +12,30 @@ import java.util.Objects;
 @Service
 public class PeopleService {
 
-    List<People> list = new ArrayList<>();
+    List<People> peopleList = new ArrayList<>();
 
 
     public People create(People people) {
-        people.setId(list.size() + 1);
-        list.add(people);
+        people.setNumberAccount(peopleList.size() + 1);
+        peopleList.add(people);
 
         return people;
     }
 
     public List<People> findAll() {
-        return list;
+        return peopleList;
     }
 
     public People findById(int id) {
-        People guy = null;
+        return peopleList.get(id - 1);
+    }
+    
+    public People updateName(int id, RequestNameUpdate nome) {
+        peopleList.get(id - 1).setName(nome.name());
 
-        for(People people : list) {
-            if (Objects.equals(people.getId(), id)) {
-                guy = new People(people.getId(), people.getName(), people.getEmail(), people.getNumber());
-            }
-        }
-
-        return guy;
+        return peopleList.get(id - 1);
+    }
+    public void deleteById(int id) {
+        peopleList.removeIf(people -> Objects.equals(people.getNumberAccount(), id));
     }
 }
