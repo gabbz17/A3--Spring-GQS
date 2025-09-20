@@ -12,7 +12,7 @@ import java.util.Objects;
 @Service
 public class PeopleService {
 
-    List<People> peopleList = new ArrayList<>();
+     public static List<People> peopleList = new ArrayList<>();
 
 
     public People create(People people) {
