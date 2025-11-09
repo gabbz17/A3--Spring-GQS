@@ -35,6 +35,11 @@ public class People {
     @OneToMany(mappedBy = "idSender")
     private List<Transaction> sendTransaction;
 
-    public People(long l, String gabriel, String mail, String number, BigDecimal bigDecimal) {
+    public People(Long numberAccount, String name, String email, String cpf, BigDecimal balance) {
+        this.numberAccount = numberAccount;
+        this.name = name;
+        this.email = email;
+        this.cpf = cpf;
+        this.balance = balance;
     }
 }
