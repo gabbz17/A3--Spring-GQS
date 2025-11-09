@@ -16,7 +16,6 @@ public class PeopleService {
 
 
     public People create(People people) {
-        people.setNumberAccount(peopleList.size() + 1);
         peopleList.add(people);
 
         return people;

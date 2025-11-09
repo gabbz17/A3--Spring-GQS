@@ -1,6 +1,8 @@
 package com.example.demo.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,13 +16,21 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
 public class Transaction {
 
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @NotNull
+    @ManyToOne
+    @JoinColumn(name = "idSender")
+    @JsonIgnore
     private People idSender;
     @NotNull
+    @ManyToOne
+    @JoinColumn(name = "idRecipient")
+    @JsonIgnore
     private People idRecipient;
     @NotNull
     private BigDecimal value;
