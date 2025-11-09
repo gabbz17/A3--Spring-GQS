@@ -7,9 +7,9 @@ import java.math.BigDecimal;
 public record RequestTransactionCreate(
 
          @NotNull
-         int idSender,
+         Long idSender,
          @NotNull
-         int idRecipient,
+         Long idRecipient,
          @NotNull
          BigDecimal value
 ) {
