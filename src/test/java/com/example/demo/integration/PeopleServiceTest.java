@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 //menciona que esta classe é um ambiente para teste de integracao
 @SpringBootTest
@@ -34,5 +35,21 @@ public class PeopleServiceTest {
 
         People find = repository.findById(1L).get();
         Assertions.assertNotNull(find);
+    }
+
+    @Test
+    void findAllUserTest() {
+
+        People gabriel = new People(null, "Gabriel", "gabriel@gmail.com", "11111111111", BigDecimal.valueOf(1000));
+
+
+        People create = service.create(gabriel);
+        Assertions.assertEquals("11111111111", create.getCpf());
+
+        List<People> findAll = repository.findAll();
+        Assertions.assertNotNull(findAll);
+        Assertions.assertEquals("Gabriel", findAll.getFirst().getName());
+
+
     }
 }
