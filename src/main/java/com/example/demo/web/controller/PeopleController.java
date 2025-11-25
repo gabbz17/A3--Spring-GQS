@@ -23,6 +23,10 @@ public class PeopleController {
     @Autowired
     PeopleService service;
 
+    @Repository
+public interface PeopleRepository extends JpaRepository<Transaction, int> {
+}
+
     @PostMapping
     public ResponseEntity<People> create(@RequestBody @Valid People people){
         People guy = service.create(people);
