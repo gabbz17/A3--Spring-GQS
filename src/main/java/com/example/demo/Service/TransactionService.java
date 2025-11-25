@@ -34,8 +34,7 @@ public class TransactionService {
 
         Random idTransaction = new Random();
 
-
-        transactionList.add(new Transaction(idTransaction.nextInt(), sender, recipient, transaction.value(), LocalDateTime.now()));
+        transactionList.add(new Transaction(Math.abs(idTransaction.nextInt()), sender, recipient, transaction.value(), LocalDateTime.now()));
 
         return transaction;
     }

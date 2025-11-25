@@ -8,7 +8,7 @@ import com.example.demo.web.dto.ResponsePeopleDto;
 public class PeopleMapper {
 
     public static ResponsePeopleDto toDto(People people) {
-        return new ResponsePeopleDto(people.getNumberAccount(), people.getName(), people.getBalance());
+        return new ResponsePeopleDto(Math.toIntExact(people.getNumberAccount()), people.getName(), people.getBalance());
     }
 
     public static List<ResponsePeopleDto> toAllDto(List<People> list) {

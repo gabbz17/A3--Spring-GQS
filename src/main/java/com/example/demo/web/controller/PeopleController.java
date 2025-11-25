@@ -1,6 +1,7 @@
 package com.example.demo.web.controller;
 
 import com.example.demo.Service.PeopleService;
+import com.example.demo.docs.PeopleDocs;
 import com.example.demo.entity.People;
 
 import com.example.demo.web.dto.RequestNameUpdate;
@@ -18,7 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/people")
-public class PeopleController {
+public class PeopleController implements PeopleDocs {
 
     @Autowired
     PeopleService service;
@@ -34,7 +35,7 @@ public interface PeopleRepository extends JpaRepository<Transaction, int> {
     }
 
     @GetMapping("/id/{id}")
-    public ResponseEntity<ResponsePeopleDto> findById(@PathVariable int id){
+    public ResponseEntity<ResponsePeopleDto> findById(@PathVariable Long id){
         People guy = service.findById(id);
         ResponsePeopleDto dto = PeopleMapper.toDto(guy);
         return ResponseEntity.ok().body(dto);
@@ -48,13 +49,13 @@ public interface PeopleRepository extends JpaRepository<Transaction, int> {
     }
 
     @PatchMapping("/id/{id}")
-    public ResponseEntity<People> updateName(@PathVariable int id, @RequestBody @Valid RequestNameUpdate nome){
+    public ResponseEntity<People> updateName(@PathVariable Long id, @RequestBody @Valid RequestNameUpdate nome){
         People guy = service.updateName(id, nome);
         return ResponseEntity.ok().body(guy);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> delebeById(@PathVariable int id){
+    public ResponseEntity<Void> deletebeById(@PathVariable Long id){
         service.deleteById(id);
         return ResponseEntity.noContent().build();
     }
