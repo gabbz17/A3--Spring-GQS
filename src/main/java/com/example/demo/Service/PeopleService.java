@@ -1,39 +1,40 @@
 package com.example.demo.Service;
 
 import com.example.demo.entity.People;
+
+import com.example.demo.repository.PeopleRepository;
+import com.example.demo.web.dto.RequestNameUpdate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class PeopleService {
 
-    List<People> list = new ArrayList<>();
-
+     @Autowired
+    PeopleRepository repository;
 
     public People create(People people) {
-        people.setId(list.size() + 1);
-        list.add(people);
-
-        return people;
+        return repository.save(people);
     }
 
     public List<People> findAll() {
-        return list;
+        return repository.findAll();
     }
 
-    public People findById(int id) {
-        People guy = null;
+    public People findById(Long id) {
+        return repository.findById(id).get();
+    }
+    
+    public People updateName(Long id, RequestNameUpdate nome) {
+        People people = findById(id);
 
-        for(People people : list) {
-            if (Objects.equals(people.getId(), id)) {
-                guy = new People(people.getId(), people.getName(), people.getEmail(), people.getNumber());
-            }
-        }
+        people.setName(nome.name());
 
-        return guy;
+        return repository.save(people);
+    }
+    public void deleteById(Long id) {
+        repository.deleteById(id);
     }
 }
