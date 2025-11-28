@@ -10,7 +10,6 @@ import com.example.demo.web.mapper.PeopleMapper;
 
 import jakarta.validation.Valid;
 
-import org.apache.catalina.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,10 +22,6 @@ public class PeopleController implements PeopleDocs {
 
     @Autowired
     PeopleService service;
-
-    @Repository
-public interface PeopleRepository extends JpaRepository<Transaction, int> {
-}
 
     @PostMapping
     public ResponseEntity<People> create(@RequestBody @Valid People people){
