@@ -17,32 +17,27 @@ public class TransactionService {
     List<Transaction> transactionList = new ArrayList<>();
 
     @Autowired
-    PeopleService peopleService;
+    TransactionRepository repository;
 
-    public RequestTransactionCreate create(RequestTransactionCreate transaction) {
+    public Transaction create(RequestTransactionCreate dto) {
 
-        People sender = peopleService.findById(transaction.idSender());
-        People recipient = peopleService.findById(transaction.idRecipient());
+        People sender = peopleService.findById(dto.idSender());
+        People recipient = peopleService.findById(dto.idRecipient());
+        Transaction transaction = new Transaction();
 
 
-        if (sender.getBalance().compareTo(transaction.value()) < 0) {
+        if (sender.getBalance().compareTo(dto.value()) < 0) {
             throw new RuntimeException("Saldo insuficiente para transação!");
         }
 
-        sender.setBalance(sender.getBalance().subtract(transaction.value()));
-        recipient.setBalance(recipient.getBalance().add(transaction.value()));
+        sender.setBalance(sender.getBalance().subtract(dto.value()));
+        recipient.setBalance(recipient.getBalance().add(dto.value()));
 
-        Random idTransaction = new Random();
+        transaction.setValue(dto.value());
+        transaction.setIdSender(sender);
+        transaction.setDateTime(LocalDateTime.now());
+        transaction.setIdRecipient(recipient);
 
-        transactionList.add(new Transaction(Math.abs(idTransaction.nextInt()), sender, recipient, transaction.value(), LocalDateTime.now()));
-
-        return transaction;
-    }
-
-    public List<Transaction> findAll() {
-        return transactionList;
-    }
-    public void deleteById(int id) {
-      transactionList.removeIf(transaction -> transaction.getId() == id);
-    }
+        return repository.save(transaction);
+    }
 }
