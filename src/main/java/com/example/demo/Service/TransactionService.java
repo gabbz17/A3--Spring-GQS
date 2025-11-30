@@ -16,11 +16,11 @@ public class TransactionService {
 
     public List<Transaction> findAll() {
         return repository.findAll();
-    }
+    }
 
 public void deleteById(int id) {
       repository.deleteById(id);
-    }
+    }
 
     List<Transaction> transactionList = new ArrayList<>();
 
@@ -47,5 +47,5 @@ public void deleteById(int id) {
         transaction.setIdRecipient(recipient);
 
         return repository.save(transaction);
-    }
+    }
 }
