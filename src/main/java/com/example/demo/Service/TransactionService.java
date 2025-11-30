@@ -18,6 +18,10 @@ public class TransactionService {
         return repository.findAll();
     }
 
+public void deleteById(int id) {
+      repository.deleteById(id);
+    }
+
     List<Transaction> transactionList = new ArrayList<>();
 
     @Autowired
