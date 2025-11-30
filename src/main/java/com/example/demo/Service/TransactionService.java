@@ -14,6 +14,10 @@ import java.util.Random;
 @Service
 public class TransactionService {
 
+    public List<Transaction> findAll() {
+        return repository.findAll();
+    }
+
     List<Transaction> transactionList = new ArrayList<>();
 
     @Autowired
