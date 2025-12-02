@@ -1,6 +1,7 @@
 package com.example.demo.web.controller;
 
 import com.example.demo.Service.PeopleService;
+import com.example.demo.docs.PeopleDocs;
 import com.example.demo.entity.People;
 
 import com.example.demo.web.dto.RequestNameUpdate;
@@ -9,7 +10,6 @@ import com.example.demo.web.mapper.PeopleMapper;
 
 import jakarta.validation.Valid;
 
-import org.apache.catalina.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/people")
-public class PeopleController {
+public class PeopleController implements PeopleDocs {
 
     @Autowired
     PeopleService service;
@@ -50,7 +50,7 @@ public class PeopleController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> delebeById(@PathVariable Long id){
+    public ResponseEntity<Void> deletebeById(@PathVariable Long id){
         service.deleteById(id);
         return ResponseEntity.noContent().build();
     }
