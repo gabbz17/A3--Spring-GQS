@@ -2,6 +2,7 @@ package com.example.demo.Service;
 
 import com.example.demo.entity.People;
 import com.example.demo.entity.Transaction;
+import com.example.demo.repository.TransactionRepository;
 import com.example.demo.web.dto.RequestTransactionCreate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,18 +15,19 @@ import java.util.Random;
 @Service
 public class TransactionService {
 
+    @Autowired
+    TransactionRepository repository;
+
+    @Autowired
+    PeopleService peopleService;
+
     public List<Transaction> findAll() {
         return repository.findAll();
     }
 
-public void deleteById(int id) {
-      repository.deleteById(id);
+    public void deleteById(int id) {
+        repository.deleteById(id);
     }
-
-    List<Transaction> transactionList = new ArrayList<>();
-
-    @Autowired
-    TransactionRepository repository;
 
     public Transaction create(RequestTransactionCreate dto) {
 
