@@ -39,7 +39,6 @@ public class TransactionServiceTest {
         sender = new People(1L, "Gabriel", "gabriel@gmail.com", "11111111111", BigDecimal.valueOf(2000.00));
         recipient = new People(2L, "Ana", "ana@gmail.com", "22222222222", BigDecimal.valueOf(1000.00));
 
-        // CORRIGIDO: O mock usa getNumberAccount()
         Mockito.when(peopleService.findById(sender.getNumberAccount())).thenReturn(sender);
         Mockito.when(peopleService.findById(recipient.getNumberAccount())).thenReturn(recipient);
     }
@@ -48,7 +47,6 @@ public class TransactionServiceTest {
     void createTransactionSuccessTest() {
         BigDecimal transactionValue = BigDecimal.valueOf(500.00);
 
-        // CORRIGIDO: Cria o DTO usando getNumberAccount()
         RequestTransactionCreate request = new RequestTransactionCreate(sender.getNumberAccount(), recipient.getNumberAccount(), transactionValue);
 
         Transaction newTransaction = new Transaction(1, sender, recipient, transactionValue, LocalDateTime.now());
@@ -60,5 +58,21 @@ public class TransactionServiceTest {
         Assertions.assertEquals(BigDecimal.valueOf(1500.00), sender.getBalance());
         Mockito.verify(repository, Mockito.times(1)).save(Mockito.any(Transaction.class));
     }
+
+    @Test
+    void createTransactionInsufficientBalanceTest() {
+        BigDecimal valueTooHigh = BigDecimal.valueOf(3000.00);
+
+        RequestTransactionCreate requestTooHigh = new RequestTransactionCreate(sender.getNumberAccount(), recipient.getNumberAccount(), valueTooHigh);
+
+        Assertions.assertThrows(
+                RuntimeException.class,
+                () -> transactionService.create(requestTooHigh),
+                "A exceção de saldo insuficiente deveria ter sido lançada"
+        );
+
+        Mockito.verify(repository, Mockito.never()).save(Mockito.any());
+    }
+
 
 }
