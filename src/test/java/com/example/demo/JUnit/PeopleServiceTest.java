@@ -70,7 +70,7 @@ public class PeopleServiceTest {
         People found = service.findById(PEOPLE_ID);
 
         Assertions.assertNotNull(found);
-        Assertions.assertEquals(PEOPLE_ID, found.getNumberAccount()); // CORRIGIDO
+        Assertions.assertEquals(PEOPLE_ID, found.getNumberAccount());
         Assertions.assertEquals("Gabriel", found.getName());
     }
     @Test

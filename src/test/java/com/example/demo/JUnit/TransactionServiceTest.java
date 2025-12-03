@@ -87,6 +87,16 @@ public class TransactionServiceTest {
         Assertions.assertEquals(2, foundTransactions.size());
     }
 
+    @Test
+    void deleteTransactionByIdTest() {
+        int idToDelete = 1;
+
+        transactionService.deleteById(idToDelete);
+
+        Mockito.verify(repository, Mockito.times(1)).deleteById(idToDelete);
+    }
+
+
 
 
 }
