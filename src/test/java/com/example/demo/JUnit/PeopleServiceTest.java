@@ -88,5 +88,11 @@ public class PeopleServiceTest {
         Assertions.assertEquals(newName, updated.getName());
         Mockito.verify(repository, Mockito.times(1)).save(updated);
     }
+    @Test
+    void deleteByIdTest() {
+        service.deleteById(PEOPLE_ID);
+
+        Mockito.verify(repository, Mockito.times(1)).deleteById(PEOPLE_ID);
+    }
 }
 
