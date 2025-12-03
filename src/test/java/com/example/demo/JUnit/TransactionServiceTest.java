@@ -74,5 +74,19 @@ public class TransactionServiceTest {
         Mockito.verify(repository, Mockito.never()).save(Mockito.any());
     }
 
+    @Test
+    void findAllTransactionsTest() {
+        Transaction transaction1 = new Transaction(1, sender, recipient, BigDecimal.valueOf(100.00), null);
+        Transaction transaction2 = new Transaction(2, recipient, sender, BigDecimal.valueOf(50.00), null);
+        List<Transaction> transactionsList = List.of(transaction1, transaction2);
+
+        Mockito.when(repository.findAll()).thenReturn(transactionsList);
+
+        List<Transaction> foundTransactions = transactionService.findAll();
+
+        Assertions.assertEquals(2, foundTransactions.size());
+    }
+
+
 
 }
