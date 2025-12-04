@@ -1,0 +1,325 @@
+name: CI/CD Pipeline - Spring Boot Application
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+env:
+  JAVA_VERSION: '21'
+  MAVEN_OPTS: -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
+
+jobs:
+  # ============================================
+  # Job 1: Build e Test
+  # ============================================
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout do código fonte
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Necessário para versionamento correto
+
+      # Configurar JDK 21
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: 'maven'
+
+      # Cache das dependências Maven para otimizar builds
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.m2/wrapper
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      # Verificar estrutura do projeto
+      - name: Display project structure
+        run: |
+          echo "=== Project Structure ==="
+          ls -la
+          echo "=== Maven Version ==="
+          ./mvnw --version
+
+      # Compilar o projeto
+      - name: Compile project
+        run: ./mvnw clean compile -B
+
+      # Executar testes unitários
+      - name: Run unit tests
+        run: ./mvnw test -B
+        continue-on-error: false
+
+      # Gerar relatório de testes
+      - name: Generate test report
+        if: always()
+        run: |
+          if [ -d "target/surefire-reports" ]; then
+            echo "=== Test Results ==="
+            cat target/surefire-reports/*.txt 2>/dev/null || echo "No test reports found"
+          fi
+
+      # Publicar resultados dos testes
+      - name: Publish test results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Maven Tests
+          path: target/surefire-reports/*.xml
+          reporter: java-junit
+          fail-on-error: true
+
+      # Build do pacote JAR
+      - name: Package application
+        run: ./mvnw package -DskipTests -B
+
+      # Verificar artefato gerado
+      - name: Verify artifact
+        run: |
+          echo "=== Generated Artifacts ==="
+          ls -lh target/*.jar
+          JAR_FILE=$(ls target/*.jar | head -n 1)
+          echo "JAR_FILE=$JAR_FILE" >> $GITHUB_ENV
+          echo "JAR_NAME=$(basename $JAR_FILE)" >> $GITHUB_ENV
+
+      # Upload do artefato para jobs subsequentes
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: application-jar
+          path: target/*.jar
+          retention-days: 30
+
+      # Upload de relatórios de teste
+      - name: Upload test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-reports
+          path: |
+            target/surefire-reports/
+            target/site/
+          retention-days: 14
+
+  # ============================================
+  # Job 2: Code Quality Analysis
+  # ============================================
+  code-quality:
+    name: Code Quality Analysis
+    runs-on: ubuntu-latest
+    needs: build-and-test
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: 'maven'
+
+      # Análise de código (você pode adicionar SonarQube ou outras ferramentas aqui)
+      - name: Run code analysis
+        run: |
+          echo "=== Running code quality checks ==="
+          ./mvnw verify -B -DskipTests
+          echo "Code analysis completed"
+
+  # ============================================
+  # Job 3: Deploy para Production Branch
+  # ============================================
+  deploy-to-production:
+    name: Deploy to Production Branch
+    runs-on: ubuntu-latest
+    needs: [build-and-test, code-quality]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Download do artefato buildado
+      - name: Download JAR artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: application-jar
+          path: ./artifacts
+
+      # Gerar versionamento baseado em commit SHA e data
+      - name: Generate version info
+        id: version
+        run: |
+          VERSION_TAG="v$(date +'%Y%m%d-%H%M%S')-${GITHUB_SHA::8}"
+          echo "VERSION_TAG=$VERSION_TAG" >> $GITHUB_ENV
+          echo "version=$VERSION_TAG" >> $GITHUB_OUTPUT
+          echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
+          echo "COMMIT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
+          echo "=== Version Information ==="
+          echo "Version: $VERSION_TAG"
+          echo "Build Date: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          echo "Commit: ${GITHUB_SHA}"
+
+      # Criar arquivo de metadados do build
+      - name: Create build metadata
+        run: |
+          mkdir -p production-release
+          cat > production-release/build-info.txt << EOF
+          ====================================
+          PRODUCTION BUILD INFORMATION
+          ====================================
+          Version: ${{ env.VERSION_TAG }}
+          Build Date: ${{ env.BUILD_DATE }}
+          Commit SHA: ${{ env.COMMIT_SHA }}
+          Branch: ${{ github.ref_name }}
+          Triggered by: ${{ github.actor }}
+          Workflow Run: ${{ github.run_number }}
+          ====================================
+          EOF
+
+          # Criar arquivo JSON com metadados
+          cat > production-release/build-metadata.json << EOF
+          {
+            "version": "${{ env.VERSION_TAG }}",
+            "buildDate": "${{ env.BUILD_DATE }}",
+            "commitSha": "${{ env.COMMIT_SHA }}",
+            "branch": "${{ github.ref_name }}",
+            "triggeredBy": "${{ github.actor }}",
+            "workflowRun": "${{ github.run_number }}",
+            "repository": "${{ github.repository }}"
+          }
+          EOF
+
+      # Copiar artefatos para diretório de release
+      - name: Prepare release artifacts
+        run: |
+          cp artifacts/*.jar production-release/
+          echo "=== Release Artifacts ==="
+          ls -lh production-release/
+
+      # Configurar Git
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+
+      # Criar ou atualizar branch production
+      - name: Deploy to production branch
+        run: |
+          # Verificar se a branch production existe remotamente
+          if git ls-remote --heads origin production | grep production; then
+            echo "Branch production exists, checking out..."
+            git fetch origin production
+            git checkout production
+            git pull origin production
+          else
+            echo "Creating new production branch..."
+            git checkout -b production
+          fi
+
+          # Limpar conteúdo anterior (exceto .git)
+          find . -maxdepth 1 ! -name '.git' ! -name '.' ! -name '..' -exec rm -rf {} +
+
+          # Copiar novos artefatos
+          cp -r production-release/* .
+
+          # Adicionar todos os arquivos
+          git add -A
+
+          # Commit com informações detalhadas
+          git commit -m "🚀 Production Deploy ${{ env.VERSION_TAG }}
+
+          Build Information:
+          - Version: ${{ env.VERSION_TAG }}
+          - Build Date: ${{ env.BUILD_DATE }}
+          - Source Commit: ${{ env.COMMIT_SHA }}
+          - Branch: ${{ github.ref_name }}
+          - Triggered by: ${{ github.actor }}
+          - Workflow Run #${{ github.run_number }}
+
+          Artifacts:
+          - JAR file(s) from successful build
+          - Build metadata and version information
+
+          🤖 Generated with GitHub Actions" || echo "No changes to commit"
+
+          # Push para branch production
+          git push origin production --force
+
+      # Criar GitHub Release (opcional)
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: production-release/*
+          generate_release_notes: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Notificação de sucesso
+      - name: Deployment success notification
+        run: |
+          echo "=========================================="
+          echo "✅ DEPLOYMENT SUCCESSFUL"
+          echo "=========================================="
+          echo "Version: ${{ env.VERSION_TAG }}"
+          echo "Deployed to: production branch"
+          echo "Commit: ${{ env.COMMIT_SHA }}"
+          echo "=========================================="
+
+  # ============================================
+  # Job 4: Notificações e Limpeza
+  # ============================================
+  notify:
+    name: Send Notifications
+    runs-on: ubuntu-latest
+    needs: [deploy-to-production]
+    if: always()
+
+    steps:
+      - name: Job Status Summary
+        run: |
+          echo "=== CI/CD Pipeline Summary ==="
+          echo "Build Status: ${{ needs.build-and-test.result }}"
+          echo "Code Quality: ${{ needs.code-quality.result }}"
+          echo "Deployment: ${{ needs.deploy-to-production.result }}"
+
+          if [ "${{ needs.deploy-to-production.result }}" == "success" ]; then
+            echo "✅ Pipeline completed successfully!"
+          else
+            echo "❌ Pipeline completed with issues"
+          fi
+
+      # Aqui você pode adicionar integrações com:
+      # - Slack
+      # - Discord
+      # - Email
+      # - Teams
+      # Exemplo comentado abaixo:
+
+      # - name: Slack Notification
+      #   uses: 8398a7/action-slack@v3
+      #   if: always()
+      #   with:
+      #     status: ${{ job.status }}
+      #     text: 'CI/CD Pipeline Status'
+      #     webhook_url: ${{ secrets.SLACK_WEBHOOK }}
