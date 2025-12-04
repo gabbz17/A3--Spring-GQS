@@ -3,6 +3,7 @@ package com.example.demo.integration;
 import com.example.demo.Service.PeopleService;
 import com.example.demo.entity.People;
 import com.example.demo.repository.PeopleRepository;
+import com.example.demo.web.dto.RequestNameUpdate;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -75,5 +76,20 @@ public class PeopleServiceTest {
         People deleted = service.findById(create.getNumberAccount());
 
         log.info("Id da deleção do meu objeto: " + deleted.getNumberAccount());
+    }
+
+    @Test
+    void updateNameTest() {
+
+        People created = service.create(gabriel);
+        Assertions.assertEquals("Gabriel", created.getName());
+        Assertions.assertEquals(23L, created.getNumberAccount());
+
+        People update = service.updateName(23L, new RequestNameUpdate("Enzo"));
+        Assertions.assertEquals("Enzo", update.getName());
+        Assertions.assertEquals(23L, update.getNumberAccount());
+
+
+
     }
 }
