@@ -34,6 +34,7 @@ public class PeopleService {
 
         return repository.save(people);
     }
+
     public void deleteById(Long id) {
         repository.deleteById(id);
     }

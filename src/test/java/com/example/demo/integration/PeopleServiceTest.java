@@ -58,11 +58,22 @@ public class PeopleServiceTest {
         Assertions.assertEquals("11111111111", create.getCpf());
         log.info("Usuario cadastrado: " + create);
 
-        People findById = service.findById(15L);
+        People findById = service.findById(16L);
         Assertions.assertNotNull(findById);
 
 
     }
 
+    @Test
+    void deleteByIdTest() {
 
+        People create = service.create(gabriel);
+        Assertions.assertNotNull(create);
+        log.info("Id da criação do meu objeto: " + create.getNumberAccount());
+
+        service.deleteById(create.getNumberAccount());
+        People deleted = service.findById(create.getNumberAccount());
+
+        log.info("Id da deleção do meu objeto: " + deleted.getNumberAccount());
+    }
 }
